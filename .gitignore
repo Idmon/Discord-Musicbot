@@ -1,0 +1,5 @@
+Logs.log
+node_modules
+.env
+guild.json
+botconfig.js

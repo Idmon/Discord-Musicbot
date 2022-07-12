@@ -205,6 +205,12 @@
               <p>Duration</p>
               <p id="duration"></p>
             </div>
+
+            <div class="queuelist">
+              <h1>Queue List</h1>
+              <br />
+              <p><ol id="full-queue"></ol></p>
+            </div>
           </section>
           <!-- Footer -->
           <div class="footer">
@@ -411,6 +417,23 @@
       socket.emit("server", window.location.pathname.split("/")[2]);
 
       socket.on("server", (data) => {
+        function clickFunc() {
+          const hpBtns = document.querySelectorAll(".queuelist button");
+          hpBtns.forEach(btn => {
+            btn.addEventListener("click", ele => {
+              socket.emit(`queueRM`, {id: Number(ele.target.textContent.split(` `)[2] - 1), guild: window.location.pathname.split(`/`)[2]})
+            })
+        })
+        }
+        function myFunction() {
+          var result = "";
+          data.fullQueue.forEach(function (item) {
+            result += `<li>${item.title} <button id='btn-remove-${Number(data.fullQueue.indexOf(item) + 1)}'>Remove song ${Number(data.fullQueue.indexOf(item) + 1)}</button>`;
+          });
+          document.getElementById("full-queue").innerHTML = result;
+        }
+        myFunction()
+        clickFunc()
         $("#songInQueue").text(data.queue);
         $("#songLoop").text(data.songsLoop);
         $("#queueLoop").text(data.queueLoop);

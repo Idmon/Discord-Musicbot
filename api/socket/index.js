@@ -40,6 +40,7 @@ module.exports = (io) => {
         } else {
           socket.emit("server", {
             queue: player.queue ? player.queue.length : 0,
+            fullQueue: player.queue ? player.queue : 0,
             songsLoop: player.trackRepeat ? "Enabled" : "Disabled",
             queueLoop: player.queueRepeat ? "Enabled" : "Disabled",
             prefix: GuildDB ? GuildDB.prefix : Client.botconfig.DefaultPrefix,
@@ -64,6 +65,15 @@ module.exports = (io) => {
       }, 1000);
     });
 
+    socket.on("queueRM", (data) => {
+      const Client = require("../../index");
+      if (!Client.Ready) return;
+      let Guild = Client.guilds.cache.get(data.guild);
+      if (!Guild) return socket.emit("error", "Unable to find that server");
+      let player = Client.Manager.get(Guild.id);
+      player.queue.remove(Number(data.id));
+    });
+
     socket.on("queue", (ServerID) => {
       if (socket.Queue) clearInterval(socket.Queue);
       socket.Queue = setInterval(async () => {
@@ -84,6 +94,7 @@ module.exports = (io) => {
         } else {
           socket.emit("queue", {
             queueSongs: player.queue ? player.queue : null,
+            fullQueue: player.queue ? player.queue : 0,
             queue: player.queue ? player.queue.length : 0,
             songsLoop: player.trackRepeat ? "Enabled" : "Disabled",
             queueLoop: player.queueRepeat ? "Enabled" : "Disabled",
@@ -108,6 +119,5 @@ module.exports = (io) => {
         }
       }, 1000);
     });
-
   });
 };

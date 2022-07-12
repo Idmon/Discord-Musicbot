@@ -12,7 +12,7 @@
       integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
       crossorigin="anonymous"
     />
-    
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -93,6 +93,7 @@
             </div>
           </div>
         </nav>
+
         <!-- Sidebar -->
 
         <!-- Navbar -->
@@ -209,13 +210,27 @@
           </section>
           <section>
             <ul id="sortable">
-              <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 1</li>
-              <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 2</li>
-              <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 3</li>
-              <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 4</li>
-              <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 5</li>
-              <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 6</li>
-              <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 7</li>
+              <li class="ui-state-default">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 1
+              </li>
+              <li class="ui-state-default">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 2
+              </li>
+              <li class="ui-state-default">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 3
+              </li>
+              <li class="ui-state-default">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 4
+              </li>
+              <li class="ui-state-default">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 5
+              </li>
+              <li class="ui-state-default">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 6
+              </li>
+              <li class="ui-state-default">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 7
+              </li>
             </ul>
           </section>
           <!-- Footer -->
@@ -226,11 +241,9 @@
                   <div class="copyright-text">
                     <p>
                       © 2021
-                      <a href="https://trapcitylife.com"
-                        >Trap City Music Bot</a
+                      <a href="https://trapcitylife.com">Trap City Music Bot</a
                       >. All rights reserved. Made by
                       <a href="https://instagram.com/idmon">Idmon</a>
-                      
                     </p>
                   </div>
                 </div>
@@ -400,14 +413,26 @@
       color: white;
     }
 
-    #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-    #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
-    #sortable li span { position: absolute; margin-left: -1.3em; }
+    #sortable {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      width: 60%;
+    }
+    #sortable li {
+      margin: 0 3px 3px 3px;
+      padding: 0.4em;
+      padding-left: 1.5em;
+      font-size: 1.4em;
+      height: 18px;
+    }
+    #sortable li span {
+      position: absolute;
+      margin-left: -1.3em;
+    }
   </style>
   <script>
-
     $(document).ready(() => {
-
       $("#sortable").sortable();
 
       $.get("/api/user", (data) => {
@@ -432,7 +457,6 @@
       socket.emit("queue", window.location.pathname.split("/")[2]);
 
       socket.on("queue", (data) => {
-
         $("#songInQueue").text(data.queue);
         $("#songLoop").text(data.songsLoop);
         $("#queueLoop").text(data.queueLoop);

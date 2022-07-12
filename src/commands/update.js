@@ -1,16 +1,16 @@
-const { Util, MessageEmbed } = require("discord.js");
+const { Util, MessageEmbed, SnowflakeUtil } = require("discord.js");
 const { TrackUtils, Player } = require("erela.js");
 const prettyMilliseconds = require("pretty-ms");
 
 module.exports = {
-  name: "play",
-  description: "Play your favorite songs",
-  usage: "[song]",
+  name: "update",
+  description: "Update your song in the queue",
+  usage: "[update]",
   permissions: {
     channel: ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"],
     member: [],
   },
-  aliases: ["p"],
+  aliases: ["u"],
   /**
    *
    * @param {import("../structures/DiscordMusicBot")} client
@@ -32,6 +32,7 @@ module.exports = {
         message.channel,
         ":x: | **You must be in the same voice channel as me to use this command!**"
       );
+    const player_exists = await client.Manager.get(message.guild.id);
     let SearchString = args.join(" ");
     if (!SearchString)
       return client.sendTime(
@@ -72,35 +73,22 @@ module.exports = {
         let node = client.Lavasfy.nodes.get(client.botconfig.Lavalink.id);
         let Searched = await node.load(SearchString);
 
-        if (Searched.loadType === "PLAYLIST_LOADED") {
-          let songs = [];
-          for (let i = 0; i < Searched.tracks.length; i++)
-            songs.push(TrackUtils.build(Searched.tracks[i], message.author));
-          player.queue.add(songs);
-          if (
-            !player.playing &&
-            !player.paused &&
-            player.queue.totalSize === Searched.tracks.length
-          )
-            player.play();
+        if (Searched.loadType.startsWith("TRACK")) {
+          let index;
+          player_exists.queue.forEach((song) => {
+            if (song.requester.id === message.author.id)
+              index = player_exists.queue.indexOf(song);
+          });
+          if (index !== -1)
+            player_exists.queue[index] = TrackUtils.build(
+              Searched.tracks[0],
+              message.author
+            );
+
           SongAddedEmbed.setAuthor(
-            `Playlist added to queue`,
-            message.author.displayAvatarURL()
+            `Updated the queue`,
+            client.botconfig.IconURL
           );
-          SongAddedEmbed.addField(
-            "Enqueued",
-            `\`${Searched.tracks.length}\` songs`,
-            false
-          );
-          //SongAddedEmbed.addField("Playlist duration", `\`${prettyMilliseconds(Searched.tracks, { colonNotation: true })}\``, false)
-          Searching.edit(SongAddedEmbed);
-        } else if (Searched.loadType.startsWith("TRACK")) {
-          player.queue.add(
-            TrackUtils.build(Searched.tracks[0], message.author)
-          );
-          if (!player.playing && !player.paused && !player.queue.size)
-            player.play();
-          SongAddedEmbed.setAuthor(`Added to queue`, client.botconfig.IconURL);
           SongAddedEmbed.setDescription(
             `[${Searched.tracks[0].info.title}](${Searched.tracks[0].info.uri})`
           );
@@ -136,40 +124,18 @@ module.exports = {
             message.channel,
             "**No matches found for - **" + SearchString
           );
-        else if (Searched.loadType == "PLAYLIST_LOADED") {
-          player.queue.add(Searched.tracks);
-          if (
-            !player.playing &&
-            !player.paused &&
-            player.queue.totalSize === Searched.tracks.length
-          )
-            player.play();
+        else {
+          let index;
+          player_exists.queue.forEach((song) => {
+            if (song.requester.id === message.author.id)
+              index = player_exists.queue.indexOf(song);
+          });
+          if (index !== -1) player_exists.queue[index] = Searched.tracks[0];
+
           SongAddedEmbed.setAuthor(
-            `Playlist added to queue`,
+            `Updated the queue`,
             client.botconfig.IconURL
           );
-          // SongAddedEmbed.setThumbnail(Searched.tracks[0].displayThumbnail());
-          SongAddedEmbed.setDescription(
-            `[${Searched.playlist.name}](${SearchString})`
-          );
-          SongAddedEmbed.addField(
-            "Enqueued",
-            `\`${Searched.tracks.length}\` songs`,
-            false
-          );
-          SongAddedEmbed.addField(
-            "Playlist duration",
-            `\`${prettyMilliseconds(Searched.playlist.duration, {
-              colonNotation: true,
-            })}\``,
-            false
-          );
-          Searching.edit(SongAddedEmbed);
-        } else {
-          player.queue.add(Searched.tracks[0]);
-          if (!player.playing && !player.paused && !player.queue.size)
-            player.play();
-          SongAddedEmbed.setAuthor(`Added to queue`, client.botconfig.IconURL);
 
           // SongAddedEmbed.setThumbnail(Searched.tracks[0].displayThumbnail());
           SongAddedEmbed.setDescription(
@@ -208,7 +174,7 @@ module.exports = {
         value: "song",
         type: 3,
         required: true,
-        description: "Play music in the voice channel",
+        description: "Update your song in the queue",
       },
     ],
     /**
@@ -236,6 +202,7 @@ module.exports = {
           interaction,
           ":x: | **You must be in the same voice channel as me to use this command!**"
         );
+      const player_exists = await client.Manager.get(message.guild.id);
       let CheckNode = client.Manager.nodes.get(client.botconfig.Lavalink.id);
       if (!CheckNode || !CheckNode.connected) {
         return client.sendTime(
@@ -274,13 +241,20 @@ module.exports = {
               interaction,
               "❌ | **No results were found.**"
             );
-          case "TRACK_LOADED":
-            player.queue.add(TrackUtils.build(Searched.tracks[0], member.user));
-            if (!player.playing && !player.paused && !player.queue.length)
-              player.play();
+          case "TRACK_LOADED": {
+            let index;
+            player_exists.queue.forEach((song) => {
+              if (song.requester.id === message.author.id)
+                index = player_exists.queue.indexOf(song);
+            });
+            if (index !== -1)
+              player_exists.queue[index] = TrackUtils.build(
+                Searched.tracks[0],
+                member.user
+              );
             let SongAddedEmbed = new MessageEmbed();
             SongAddedEmbed.setAuthor(
-              `Added to queue`,
+              `Updated the queue`,
               client.botconfig.IconURL
             );
             SongAddedEmbed.setColor(client.botconfig.EmbedColor);
@@ -299,11 +273,18 @@ module.exports = {
                 true
               );
             return interaction.send(SongAddedEmbed);
-
-          case "SEARCH_RESULT":
-            player.queue.add(TrackUtils.build(Searched.tracks[0], member.user));
-            if (!player.playing && !player.paused && !player.queue.length)
-              player.play();
+          }
+          case "SEARCH_RESULT": {
+            let index;
+            player_exists.queue.forEach((song) => {
+              if (song.requester.id === message.author.id)
+                index = player_exists.queue.indexOf(song);
+            });
+            if (index !== -1)
+              player_exists.queue[index] = TrackUtils.build(
+                Searched.tracks[0],
+                member.user
+              );
             let SongAdded = new MessageEmbed();
             SongAdded.setAuthor(`Added to queue`, client.botconfig.IconURL);
             SongAdded.setColor(client.botconfig.EmbedColor);
@@ -318,32 +299,7 @@ module.exports = {
                 true
               );
             return interaction.send(SongAdded);
-
-          case "PLAYLIST_LOADED":
-            let songs = [];
-            for (let i = 0; i < Searched.tracks.length; i++)
-              songs.push(TrackUtils.build(Searched.tracks[i], member.user));
-            player.queue.add(songs);
-            if (
-              !player.playing &&
-              !player.paused &&
-              player.queue.totalSize === Searched.tracks.length
-            )
-              player.play();
-            let Playlist = new MessageEmbed();
-            Playlist.setAuthor(
-              `Playlist added to queue`,
-              client.botconfig.IconURL
-            );
-            Playlist.setDescription(
-              `[${Searched.playlistInfo.name}](${interaction.data.options[0].value})`
-            );
-            Playlist.addField(
-              "Enqueued",
-              `\`${Searched.tracks.length}\` songs`,
-              false
-            );
-            return interaction.send(Playlist);
+          }
         }
       } else {
         try {
@@ -368,13 +324,16 @@ module.exports = {
               interaction,
               "❌ | **No results were found.**"
             );
-          case "TRACK_LOADED":
-            player.queue.add(res.tracks[0]);
-            if (!player.playing && !player.paused && !player.queue.length)
-              player.play();
+          case "TRACK_LOADED": {
+            let index;
+            player_exists.queue.forEach((song) => {
+              if (song.requester.id === message.author.id)
+                index = player_exists.queue.indexOf(song);
+            });
+            if (index !== -1) player_exists.queue[index] = res.tracks[0];
             let SongAddedEmbed = new MessageEmbed();
             SongAddedEmbed.setAuthor(
-              `Added to queue`,
+              `Updated the queue`,
               client.botconfig.IconURL
             );
             //SongAddedEmbed.setThumbnail(res.tracks[0].displayThumbnail());
@@ -397,40 +356,20 @@ module.exports = {
                 true
               );
             return interaction.send(SongAddedEmbed);
-
-           case "PLAYLIST_LOADED":
-            player.queue.add(res.tracks);
-            await player.play();
-            let SongAdded = new MessageEmbed();
-            SongAdded.setAuthor(
-              `Playlist added to queue`,
-              client.botconfig.IconURL
-            );
-            //SongAdded.setThumbnail(res.tracks[0].displayThumbnail());
-            SongAdded.setDescription(
-              `[${res.playlist.name}](${interaction.data.options[0].value})`
-            );
-            SongAdded.addField(
-              "Enqueued",
-              `\`${res.tracks.length}\` songs`,
-              false
-            );
-            SongAdded.addField(
-              "Playlist duration",
-              `\`${prettyMilliseconds(res.playlist.duration, {
-                colonNotation: true,
-              })}\``,
-              false
-            );
-            return interaction.send(SongAdded);
+          }
           case "SEARCH_RESULT":
             const track = res.tracks[0];
-            player.queue.add(track);
+            let index;
+            player_exists.queue.forEach((song) => {
+              if (song.requester.id === message.author.id)
+                index = player_exists.queue.indexOf(song);
+            });
+            if (index !== -1) player_exists.queue[index] = track;
 
             if (!player.playing && !player.paused && !player.queue.length) {
               let SongAddedEmbed = new MessageEmbed();
               SongAddedEmbed.setAuthor(
-                `Added to queue`,
+                `Updated the queue`,
                 client.botconfig.IconURL
               );
               SongAddedEmbed.setThumbnail(track.displayThumbnail());
@@ -455,7 +394,7 @@ module.exports = {
             } else {
               let SongAddedEmbed = new MessageEmbed();
               SongAddedEmbed.setAuthor(
-                `Added to queue`,
+                `Updated the queue`,
                 client.botconfig.IconURL
               );
               SongAddedEmbed.setThumbnail(track.displayThumbnail());
