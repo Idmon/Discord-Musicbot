@@ -13,9 +13,8 @@ const deezer = require("erela.js-deezer");
 const apple = require("erela.js-apple");
 const facebook = require("erela.js-facebook");
 
-//Class extending Stuff
-require("discordjs-activity"); //Epic Package, For more details: https://www.npmjs.com/package/discordjs-activity
-require("./EpicPlayer"); //idk why im doing but i wanna learn something new so...
+require("discordjs-activity");
+require("./EpicPlayer");
 
 class DiscordMusicBot extends Client {
   constructor(props) {
@@ -27,17 +26,14 @@ class DiscordMusicBot extends Client {
     this.SongsPlayed = 0;
 
     this.database = {
-      //Saved at jsoning node_modules directory, DOCS: https://jsoning.js.org/
-      guild: new Jsoning("guild.json"), //Server Config
+      guild: new Jsoning("guild.json"),
     };
-    this.logger = new Logger(path.join(__dirname, "..", "Logs.log"));
+    this.logger = new Logger(path.join(__dirname, "..", "..", "Logs.log"));
 
     try {
-      //Config for testing
-      this.botconfig = require("../dev-config");
+      this.botconfig = require("../../dev-config");
     } catch {
-      //Config for production
-      this.botconfig = require("../botconfig");
+      this.botconfig = require("../../botconfig");
     }
     if (this.botconfig.Token === "")
       return new TypeError(
@@ -47,12 +43,11 @@ class DiscordMusicBot extends Client {
     this.LoadCommands();
     this.LoadEvents();
 
-    //Web Stuff
     this.server = Express();
     this.http = http.createServer(this.server);
-    this.server.use("/", require("../api"));
+    this.server.use("/", require("../../api"));
     this.io = new Server(this.http);
-    require("../api/socket")(this.io);
+    require("../../api/socket")(this.io);
 
     //Utils
     this.ProgressBar = require("../util/ProgressBar");
@@ -70,7 +65,6 @@ class DiscordMusicBot extends Client {
 
     this.Ready = false;
 
-    //idk where do i do it so i did it here ;-;
     this.ws.on("INTERACTION_CREATE", async (interaction) => {
       let GuildDB = await this.GetGuild(interaction.guild_id);
 
@@ -86,7 +80,6 @@ class DiscordMusicBot extends Client {
       const command = interaction.data.name.toLowerCase();
       const args = interaction.data.options;
 
-      //Easy to send respnose so ;)
       interaction.guild = await this.guilds.fetch(interaction.guild_id);
       interaction.send = async (message) => {
         return await this.api
@@ -109,7 +102,6 @@ class DiscordMusicBot extends Client {
         cmd.SlashCommand.run(this, interaction, args, { GuildDB });
     });
 
-    //because not worked lol ;-;
     const client = this;
 
     this.Lavasfy = new LavasfyClient(
@@ -133,11 +125,7 @@ class DiscordMusicBot extends Client {
     );
 
     this.Manager = new Manager({
-      plugins: [
-        new deezer(),
-        new apple(),
-        new facebook(),
-      ],
+      plugins: [new deezer(), new apple(), new facebook()],
       nodes: [
         {
           identifier: this.botconfig.Lavalink.id,

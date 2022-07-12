@@ -6,11 +6,11 @@ This may help you if you are editing this script
 
 /api - Website, Socket and routes
 /assets - Images and other stuff will be public
-/commands - Bot commands and slash commands
-/events - Client events
-/structures - Classes
-/util - Extra stuffs
-/views - Page Rendering/Website
+/src/commands - Bot commands and slash commands
+/src/events - Client events
+/src/structures - Classes
+/src/util - Extra stuffs
+/api/views - Page Rendering/Website
 
 ## Permissions
 
