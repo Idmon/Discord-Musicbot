@@ -202,7 +202,7 @@ module.exports = {
           interaction,
           ":x: | **You must be in the same voice channel as me to use this command!**"
         );
-      const player_exists = await client.Manager.get(message.guild.id);
+      const player_exists = await client.Manager.get(interaction.guild_id);
       let CheckNode = client.Manager.nodes.get(client.botconfig.Lavalink.id);
       if (!CheckNode || !CheckNode.connected) {
         return client.sendTime(
