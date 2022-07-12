@@ -202,7 +202,7 @@ module.exports = {
           interaction,
           ":x: | **You must be in the same voice channel as me to use this command!**"
         );
-      const player_exists = await client.Manager.get(message.guild.id);
+      const player_exists = await client.Manager.get(interaction.guild.id);
       if (player_exists) {
         let found = false;
         if (player_exists.queue.current.requester.id === message.author.id)
