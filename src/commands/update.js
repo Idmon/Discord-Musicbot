@@ -244,7 +244,7 @@ module.exports = {
           case "TRACK_LOADED": {
             let index;
             player_exists.queue.forEach((song) => {
-              if (song.requester.id === message.author.id)
+              if (song.requester.id === interaction.member.user.id)
                 index = player_exists.queue.indexOf(song);
             });
             if (index !== -1)
@@ -277,7 +277,7 @@ module.exports = {
           case "SEARCH_RESULT": {
             let index;
             player_exists.queue.forEach((song) => {
-              if (song.requester.id === message.author.id)
+              if (song.requester.id === interaction.member.user.id)
                 index = player_exists.queue.indexOf(song);
             });
             if (index !== -1)
@@ -327,7 +327,7 @@ module.exports = {
           case "TRACK_LOADED": {
             let index;
             player_exists.queue.forEach((song) => {
-              if (song.requester.id === message.author.id)
+              if (song.requester.id === interaction.member.user.id)
                 index = player_exists.queue.indexOf(song);
             });
             if (index !== -1) player_exists.queue[index] = res.tracks[0];
@@ -361,7 +361,7 @@ module.exports = {
             const track = res.tracks[0];
             let index;
             player_exists.queue.forEach((song) => {
-              if (song.requester.id === message.author.id)
+              if (song.requester.id === interaction.member.user.id)
                 index = player_exists.queue.indexOf(song);
             });
             if (index !== -1) player_exists.queue[index] = track;

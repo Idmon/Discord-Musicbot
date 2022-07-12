@@ -202,16 +202,19 @@ module.exports = {
           interaction,
           ":x: | **You must be in the same voice channel as me to use this command!**"
         );
-      const player_exists = await client.Manager.get(interaction.guild.id);
+      const player_exists = await client.Manager.get(interaction.guild_id);
       if (player_exists) {
         let found = false;
-        if (player_exists.queue.current.requester.id === message.author.id)
+        if (
+          player_exists.queue.current.requester.id ===
+          interaction.member.user.id
+        )
           return client.sendTime(
             interaction,
             ":x: | **You have already added a song to the DJ Queue!**"
           );
         player_exists.queue.forEach((song) => {
-          if (song.requester.id === message.author.id) found = true;
+          if (song.requester.id === interaction.member.user.id) found = true;
         });
         if (found)
           return client.sendTime(
