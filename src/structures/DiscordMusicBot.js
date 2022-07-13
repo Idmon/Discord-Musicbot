@@ -12,6 +12,7 @@ const prettyMilliseconds = require("pretty-ms");
 const deezer = require("erela.js-deezer");
 const apple = require("erela.js-apple");
 const facebook = require("erela.js-facebook");
+const Enmap = require("enmap");
 
 require("discordjs-activity");
 require("./EpicPlayer");
@@ -27,6 +28,7 @@ class DiscordMusicBot extends Client {
 
     this.database = {
       guild: new Jsoning("guild.json"),
+      likes: new Enmap("likes"),
     };
     this.logger = new Logger(path.join(__dirname, "..", "..", "Logs.log"));
 
